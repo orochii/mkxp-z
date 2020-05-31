@@ -62,6 +62,7 @@ class Bitmap
   #=============================================================================
   # * drawCircle
   # drawCircle(color,radius,center_x,center_y,hollow?)
+  # inori original example. It might not work.
   #-----------------------------------------------------------------------------
   def drawCircle(color=Color.new(255,255,255),r=(self.width/2),tx=(self.width/2),ty=(self.height/2),hollow=false)
     # basic circle formula
