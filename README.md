@@ -1,8 +1,15 @@
 # mkxp-z
 
-![ss](/screenshot.png?raw=true)
+![ss](/dreki_screen.png?raw=true)
 
 This is a fork of mkxp intended to be a little more than just a barebones recreation of RPG Maker. The original goal was successfully running games based on Pokemon Essentials, which is notoriously dependent on Windows APIs. I'd consider that mission accomplished.
+
+## About this specific fork
+This is a custom mkxp-z fork with a lot of extra kinky stuff, all done with no regard for human life.
+* Added support for gamepad direct access ("raw"). Only button behaviour for now, not interested in axises. Methods are **jpressex(button)**, **jtriggerex(button)** and **jrepeatex(button)**.
+* ***lastKey*** and ***lastJoy*** variables, they help on making custom input rebindings. They tell you/me the last triggered key/button.
+* Removed the F1 menu completely because it's ugly. :)
+* Vertical wave effect, because why not.
 
 ## Bindings
 Bindings provide the glue code for an interpreted language environment to run game scripts in. mkxp-z focuses on MRI and as such the mruby and null bindings are not included. The original MRI bindings remain. Please see the original README for more details.
