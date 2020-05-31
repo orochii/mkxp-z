@@ -8,7 +8,7 @@ This is a fork of mkxp intended to be a little more than just a barebones recrea
 This is a custom mkxp-z fork with a lot of extra kinky stuff, all done with no regard for human life.
 * Added support for gamepad direct access ("raw"). Only button behaviour for now, not interested in axises. Methods are **jpressex(button)**, **jtriggerex(button)** and **jrepeatex(button)**.
 * ***lastKey*** and ***lastJoy*** variables, they help on making custom input rebindings. They tell you/me the last triggered key/button.
-* Removed the F1 menu completely because it's ugly. :)
+* Removed the F1 options menu call because it's ugly, you can still call it through script though. :)
 * Vertical wave effect, because why not.
 
 ## Bindings
