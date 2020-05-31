@@ -1,6 +1,6 @@
 # mkxp-z
 
-![ss](/screenshot.png?raw=true)
+![ss](/dreki_screen.png?raw=true)
 
 This is a fork of mkxp intended to be a little more than just a barebones recreation of RPG Maker. The original goal was successfully running games based on Pokemon Essentials, which is notoriously dependent on Windows APIs. I'd consider that mission accomplished.
 
