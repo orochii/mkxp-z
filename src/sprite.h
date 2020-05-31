@@ -56,6 +56,7 @@ public:
 	DECL_ATTR( ZoomY,       float   )
 	DECL_ATTR( Angle,       float   )
 	DECL_ATTR( Mirror,      bool    )
+	DECL_ATTR( WaveMode,    int     )
 	DECL_ATTR( BushDepth,   int     )
 	DECL_ATTR( BushOpacity, int     )
 	DECL_ATTR( Opacity,     int     )
@@ -66,7 +67,7 @@ public:
 	DECL_ATTR( WaveLength,  int     )
 	DECL_ATTR( WaveSpeed,   int     )
 	DECL_ATTR( WavePhase,   float   )
-
+	// asdasd
 	void initDynAttribs();
 
 private:

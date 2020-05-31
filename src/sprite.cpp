@@ -76,6 +76,7 @@ struct SpritePrivate
 		int length;
 		int speed;
 		float phase;
+		int mode;
 
 		/* Wave effect is active (amp != 0) */
 		bool active;
@@ -114,6 +115,7 @@ struct SpritePrivate
 		wave.speed = 360;
 		wave.phase = 0.0f;
 		wave.dirty = false;
+		wave.mode = 0;
 	}
 
 	~SpritePrivate()
@@ -210,9 +212,13 @@ struct SpritePrivate
 
 		FloatRect tex(0, chunkY / zoomY, width, chunkLength / zoomY);
 		FloatRect pos = tex;
-		pos.x = chunkX;
-
-		Quad::setTexPosRect(vert, tex, pos);
+		if (wave.mode == 1) {
+			tex.y += chunkX;
+		} else {
+			pos.x = chunkX;
+		}
+		// quad.setTexRect(mirrored ? rect.hFlipped() : rect);
+		Quad::setTexPosRect(vert, mirrored ? tex.hFlipped() : tex, pos);
 		vert += 4;
 	}
 
@@ -327,6 +333,7 @@ DEF_ATTR_RD_SIMPLE(Sprite, WaveAmp,    int,     p->wave.amp)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveLength, int,     p->wave.length)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveSpeed,  int,     p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Sprite, WavePhase,  float,   p->wave.phase)
+DEF_ATTR_RD_SIMPLE(Sprite, WaveMode,   int,     p->wave.mode)
 
 DEF_ATTR_SIMPLE(Sprite, BushOpacity, int,     p->bushOpacity)
 DEF_ATTR_SIMPLE(Sprite, Opacity,     int,     p->opacity)
@@ -490,6 +497,7 @@ DEF_WAVE_SETTER(Amp,    amp,    int)
 DEF_WAVE_SETTER(Length, length, int)
 DEF_WAVE_SETTER(Speed,  speed,  int)
 DEF_WAVE_SETTER(Phase,  phase,  float)
+DEF_WAVE_SETTER(Mode,  mode,  int)
 
 #undef DEF_WAVE_SETTER
 

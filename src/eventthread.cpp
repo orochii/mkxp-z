@@ -294,13 +294,13 @@ void EventThread::process(RGSSThreadData &rtData)
 
 			if (event.key.keysym.scancode == SDL_SCANCODE_F1)
 			{
-				if (!sMenu)
+				/*if (!sMenu)
 				{
 					sMenu = new SettingsMenu(rtData);
 					updateCursorState(false, gameScreen);
 				}
 
-				sMenu->raise();
+				sMenu->raise();*/
 			}
 
 			if (event.key.keysym.scancode == SDL_SCANCODE_F2)

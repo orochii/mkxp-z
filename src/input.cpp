@@ -201,6 +201,170 @@ std::unordered_map<int, int> vKeyToScancode{
     m(0xfe, CLEAR)
 };
 #undef m
+
+#define m(vk,sc) { SDL_SCANCODE_##sc, vk }
+std::unordered_map<int, int> scancodeToVK{
+    // 0x01 LEFT MOUSE
+    // 0x02 RIGHT MOUSE
+    m(0x03, CANCEL),
+    // 0x04 MIDDLE MOUSE
+    // 0x05 XBUTTON 1
+    // 0x06 XBUTTON 2
+    // 0x07 undef
+    m(0x08, BACKSPACE),
+    m(0x09, TAB),
+    // 0x0a reserved
+    // 0x0b reserved
+    m(0x0c, CLEAR),
+    m(0x0d, RETURN),
+    // 0x0e undefined
+    // 0x0f undefined
+    // 0x10 SHIFT (both)
+    // 0x11 CONTROL (both)
+    // 0x12 ALT (both)
+    m(0x13, PAUSE),
+    m(0x14, CAPSLOCK),
+    // 0x15 KANA, HANGUL
+    // 0x16 undefined
+    // 0x17 JUNJA
+    // 0x18 FINAL
+    // 0x19 HANJA, KANJI
+    // 0x1a undefined
+    m(0x1b, ESCAPE),
+    // 0x1c CONVERT
+    // 0x1d NONCONVERT
+    // 0x1e ACCEPT
+    // 0x1f MODECHANGE
+    m(0x20, SPACE),
+    m(0x21, PAGEUP),
+    m(0x22, PAGEDOWN),
+    m(0x23, END),
+    m(0x24, HOME),
+    m(0x25, LEFT),
+    m(0x26, UP),
+    m(0x27, RIGHT),
+    m(0x28, DOWN),
+    m(0x29, SELECT),
+    // 0x2A print
+    m(0x2b, EXECUTE),
+    m(0x2c, PRINTSCREEN),
+    m(0x2d, INSERT),
+    m(0x2e, DELETE),
+    m(0x2f, HELP),
+    m(0x30, 0), m(0x31, 1),
+    m(0x32, 2), m(0x33, 3),
+    m(0x34, 4), m(0x35, 5),
+    m(0x36, 6), m(0x37, 7),
+    m(0x38, 8), m(0x39, 9),
+    // 0x3a-0x40 undefined
+    m(0x41, A), m(0x42, B),
+    m(0x43, C), m(0x44, D),
+    m(0x45, E), m(0x46, F),
+    m(0x47, G), m(0x48, H),
+    m(0x49, I), m(0x4a, J),
+    m(0x4b, K), m(0x4c, L),
+    m(0x4d, M), m(0x4e, N),
+    m(0x4f, O), m(0x50, P),
+    m(0x51, Q), m(0x52, R),
+    m(0x53, S), m(0x54, T),
+    m(0x55, U), m(0x56, V),
+    m(0x57, W), m(0x58, X),
+    m(0x59, Y), m(0x5a, Z),
+    m(0x5b, LGUI), m(0x5c, RGUI),
+    m(0x5d, APPLICATION),
+    // 0x5e reserved
+    m(0x5f, SLEEP),
+    m(0x60, KP_0), m(0x61, KP_1),
+    m(0x62, KP_2), m(0x63, KP_3),
+    m(0x64, KP_4), m(0x65, KP_5),
+    m(0x66, KP_6), m(0x67, KP_7),
+    m(0x68, KP_8), m(0x69, KP_9),
+    m(0x6a, KP_MULTIPLY),
+    m(0x6b, KP_PLUS),
+    m(0x6c, RETURN), // SEPARATOR
+    m(0x6d, KP_MINUS),
+    m(0x6e, KP_DECIMAL),
+    m(0x6f, KP_DIVIDE),
+    m(0x70, F1), m(0x71, F2),
+    m(0x72, F3), m(0x73, F4),
+    m(0x74, F5), m(0x75, F6),
+    m(0x76, F7), m(0x77, F8),
+    m(0x78, F9), m(0x79, F10),
+    m(0x7a, F11), m(0x7b, F12),
+    m(0x7c, F13), m(0x7d, F14),
+    m(0x7e, F15), m(0x7f, F16),
+    m(0x80, F17), m(0x81, F18),
+    m(0x82, F19), m(0x83, F20),
+    m(0x84, F21), m(0x85, F22),
+    m(0x86, F23), m(0x87, F24),
+    // 0x88-0x8f unassigned
+    m(0x90, NUMLOCKCLEAR),
+    m(0x91, SCROLLLOCK),
+    // 0x92-0x96 oem specific
+    // 0x97-0x9f unassigned
+    m(0xa0, LSHIFT),
+    m(0xa1, RSHIFT),
+    m(0xa2, LCTRL),
+    m(0xa3, RCTRL),
+    m(0xa4, LALT),
+    m(0xa5, RALT),
+    m(0xa6, AC_BACK),
+    m(0xa7, AC_FORWARD),
+    m(0xa8, AC_REFRESH),
+    m(0xa9, AC_STOP),
+    m(0xaa, AC_SEARCH),
+    // 0xab BROWSER_FAVORITES
+    m(0xac, AC_HOME),
+    m(0xad, AUDIOMUTE),
+    m(0xae, VOLUMEDOWN),
+    m(0xaf, VOLUMEUP),
+    m(0xb0, AUDIONEXT),
+    m(0xb1, AUDIOPREV),
+    m(0xb2, AUDIOSTOP),
+    m(0xb3, AUDIOPLAY),
+    m(0xb4, MAIL),
+    m(0xb5, MEDIASELECT),
+    // 0xb6 LAUNCH_APP1
+    // 0xb7 LAUNCH_APP2
+    // 0xb8-0xb9 reserved
+    
+    // Everything below here is OEM
+    // and can vary by country
+    m(0xba, SEMICOLON),
+    m(0xbb, EQUALS),
+    m(0xbc, COMMA),
+    m(0xbd, MINUS),
+    m(0xbe, PERIOD),
+    m(0xbf, SLASH),
+    m(0xc0, GRAVE),
+    // 0xc1-0xd7 reserved
+    // 0xd8-0xda unassigned
+    m(0xdb, LEFTBRACKET),
+    m(0xdc, BACKSLASH),
+    m(0xdd, RIGHTBRACKET),
+    m(0xde, APOSTROPHE),
+    // 0xdf OEM_8
+    // 0xe0 reserved
+    // 0xe1 oem-specific
+    // 0xe2 OEM_102
+    // 0xe3-0xe4 oem-specific
+    // 0xe5 PROCESSKEY
+    // 0xe6 oem-specific
+    // 0xe7 PACKET
+    // 0xe8 unassigned
+    // 0xe9-0xf5 oem_specific
+    // 0xf6 ATTN
+    m(0xf7, CRSEL),
+    m(0xf8, EXSEL),
+    // 0xf9 EREOF
+    m(0xfa, AUDIOPLAY), // PLAY, guessing
+    // 0xfb ZOOM
+    // 0xfc NONAME
+    // 0xfd PA1
+    m(0xfe, CLEAR)
+};
+#undef m
+
 #define m(keycode) { #keycode, SDL_SCANCODE_##keycode }
 std::unordered_map<std::string, int> strToScancode{
     m(0), m(1),
@@ -418,8 +582,32 @@ std::unordered_map<std::string, int> strToScancode{
     m(NONUSBACKSLASH),
     m(NONUSHASH)
 };
-
 #undef m
+
+std::unordered_map<std::string, int> strToJoycode{
+    {"AX_1", 0}, {"AX_2", 1}, 
+    {"AX_3", 2}, {"AX_4", 3}, 
+    {"AX_5", 4}, {"AX_6", 5}, 
+    {"AX_7", 6}, {"AX_8", 7}, 
+    {"AX_9", 8}, {"AX_10",9}, 
+
+    {"HT_1",10}, {"HT_2", 11}, 
+    {"HT_3",12}, {"HT_4", 13}, 
+    {"HT_5",14}, {"HT_6", 15}, 
+    {"HT_7",16}, {"HT_8", 17}, 
+    {"HT_9",18}, {"HT_10",19}, 
+
+    {"BT_01",20}, {"BT_02",21}, 
+    {"BT_03",22}, {"BT_04",23}, 
+    {"BT_05",24}, {"BT_06",25}, 
+    {"BT_07",26}, {"BT_08",27}, 
+    {"BT_09",28}, {"BT_10",29}, 
+    {"BT_11",30}, {"BT_12",31}, 
+    {"BT_13",32}, {"BT_14",33}, 
+    {"BT_15",34}, {"BT_16",35}, 
+    {"BT_17",36}, {"BT_18",37}, 
+    {"BT_19",38}, {"BT_20",39}
+};
 
 struct ButtonState
 {
@@ -673,10 +861,20 @@ struct InputPrivate
     uint8_t *rawStates;
     uint8_t *rawStatesOld;
 
+    // Raw joystates
+    uint8_t rawJoyStateArray[40 * 2];
+    
+    uint8_t *rawJoyStates;
+    uint8_t *rawJoyStatesOld;
+
 	Input::ButtonCode repeating;
     int rawRepeating;
+    int rawJoyRepeating;
 	unsigned int repeatCount;
     unsigned int rawRepeatCount;
+    unsigned int rawJoyRepeatCount;
+    uint8_t inputLastKey;
+    uint8_t inputLastJoy;
 
 	struct
 	{
@@ -703,6 +901,9 @@ struct InputPrivate
         
         rawStates = rawStateArray;
         rawStatesOld = rawStateArray + SDL_NUM_SCANCODES;
+
+        rawJoyStates = rawJoyStateArray;
+        rawJoyStatesOld = rawJoyStateArray + 40;
 
 		/* Clear buffers */
 		clearBuffer();
@@ -800,6 +1001,29 @@ struct InputPrivate
         return b;
     }
 
+    inline ButtonState getJoyStateRaw(int code, bool useVKey)
+    {
+        ButtonState b;
+        int scancode = code; //(useVKey) ? -1 : code;
+        // Fuck virtual keys differentiation.
+        // if (scancode < 0) return b;
+        
+        b.pressed = rawJoyStates[scancode];
+        b.triggered = (rawJoyStates[scancode] && !rawJoyStatesOld[scancode]);
+        
+        bool repeated = false;
+        if (scancode == rawJoyRepeating)
+        {
+            if (rgssVer >= 2)
+            repeated = rawJoyRepeatCount >= 23 && ((rawJoyRepeatCount+1) % 6) == 0;
+            else
+            repeated = rawJoyRepeatCount >= 15 && ((rawJoyRepeatCount+1) % 4) == 0;
+        }
+        b.repeated = repeated;
+        
+        return b;
+    }
+
 	void swapBuffers()
 	{
 		ButtonState *tmp = states;
@@ -809,6 +1033,10 @@ struct InputPrivate
         uint8_t *tmpr = rawStates;
         rawStates = rawStatesOld;
         rawStatesOld = tmpr;
+
+        uint8_t *tmprj = rawJoyStates;
+        rawJoyStates = rawJoyStatesOld;
+        rawJoyStatesOld = tmprj;
 	}
 
 	void clearBuffer()
@@ -817,6 +1045,7 @@ struct InputPrivate
 		memset(states, 0, size);
         
         memset(rawStates, 0, SDL_NUM_SCANCODES);
+        memset(rawJoyStates, 0, 40);
 	}
 
 	void checkBindingChange(const RGSSThreadData &rtData)
@@ -972,7 +1201,9 @@ struct InputPrivate
     void updateRaw()
     {
         memcpy(rawStates, shState->eThread().keyStates, SDL_NUM_SCANCODES);
-        
+        // Refresh last trigger flag
+        inputLastKey = 0;
+        // Update keys repeat and last trigger
         for (int i = 0; i < SDL_NUM_SCANCODES; i++)
         {
             if (rawStates[i] && rawStatesOld[i])
@@ -985,9 +1216,58 @@ struct InputPrivate
                 {
                     rawRepeatCount = 0;
                     rawRepeating = i;
+                    inputLastKey = i;
                 }
                 
                 break;
+            }
+            // Update last trigger
+            if (rawStates[i] && !rawStatesOld[i]) {
+                inputLastKey = i;
+            }
+        }
+    }
+
+    void updateRawJoy() {
+        // Update first 10 axis
+        for (int i = 0; i < 10; i++) {
+            int value = EventThread::joyState.axes[i];
+            rawJoyStates[i] = value != 0;
+        }
+        // Update first 10 hats
+        for (int i = 0; i < 10; i++) {
+            uint8_t value = EventThread::joyState.hats[i];
+            rawJoyStates[i + 10] = value != SDL_HAT_CENTERED;
+        }
+        // Update first 20 buttons
+        for (int i = 0; i < 20; i++) {
+            bool value = EventThread::joyState.buttons[i];
+            rawJoyStates[i + 20] = value;
+        }
+        // AND THAT'S IT!
+        // Refresh last trigger flag
+        inputLastJoy = 0;
+        // Update repeating and last trigger.
+        for (int i = 0; i < 40; i++)
+        {
+            if (rawJoyStates[i] && rawJoyStatesOld[i])
+            {
+                if (rawJoyRepeating == i)
+                {
+                    rawJoyRepeatCount++;
+                }
+                else
+                {
+                    rawJoyRepeatCount = 0;
+                    rawJoyRepeating = i;
+                    inputLastJoy = i;
+                }
+                
+                break;
+            }
+            // Update last trigger
+            if (rawJoyStates[i] && !rawJoyStatesOld[i]) {
+                inputLastJoy = i;
             }
         }
     }
@@ -1095,6 +1375,7 @@ void Input::update()
     
     // Get raw keystates
     p->updateRaw();
+    p->updateRawJoy();
 
 	/* Check for new repeating key */
 	if (repeatCand != None && repeatCand != p->repeating)
@@ -1155,6 +1436,21 @@ bool Input::isRepeatedEx(int code, bool isVKey)
     return p->getStateRaw(code, isVKey).repeated;
 }
 
+bool Input::isJPressedEx(int code, bool isVKey)
+{
+    return p->getJoyStateRaw(code, isVKey).pressed;
+}
+
+bool Input::isJTriggeredEx(int code, bool isVKey)
+{
+    return p->getJoyStateRaw(code, isVKey).triggered;
+}
+
+bool Input::isJRepeatedEx(int code, bool isVKey)
+{
+    return p->getJoyStateRaw(code, isVKey).repeated;
+}
+
 int Input::dir4Value()
 {
 	return p->dir4Data.active;
@@ -1177,6 +1473,15 @@ int Input::mouseY()
 	RGSSThreadData &rtData = shState->rtData();
 
 	return (EventThread::mouseState.y - rtData.screenOffset.y) * rtData.sizeResoRatio.y;
+}
+
+int Input::getLastKey()
+{
+	return scancodeToVK[p->inputLastKey];
+}
+int Input::getLastJoy()
+{
+	return p->inputLastJoy;
 }
 
 bool Input::getJoystickConnected()

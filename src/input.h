@@ -26,7 +26,9 @@
 #include <string>
 
 extern std::unordered_map<int, int> vKeyToScancode;
+extern std::unordered_map<int, int> scancodeToVK;
 extern std::unordered_map<std::string, int> strToScancode;
+extern std::unordered_map<std::string, int> strToJoycode;
 
 struct InputPrivate;
 struct RGSSThreadData;
@@ -60,6 +62,9 @@ public:
     bool isPressedEx(int code, bool isVKey);
     bool isTriggeredEx(int code, bool isVKey);
     bool isRepeatedEx(int code, bool isVKey);
+	bool isJPressedEx(int code, bool isVKey);
+    bool isJTriggeredEx(int code, bool isVKey);
+    bool isJRepeatedEx(int code, bool isVKey);
 
 	int dir4Value();
 	int dir8Value();
@@ -67,6 +72,8 @@ public:
 	/* Non-standard extensions */
 	int mouseX();
 	int mouseY();
+	int getLastKey();
+	int getLastJoy();
     
     bool getJoystickConnected();
     const char *getJoystickName();

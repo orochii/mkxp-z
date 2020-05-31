@@ -65,6 +65,7 @@ DEF_PROP_I(Sprite, BlendType)
 DEF_PROP_I(Sprite, WaveAmp)
 DEF_PROP_I(Sprite, WaveLength)
 DEF_PROP_I(Sprite, WaveSpeed)
+DEF_PROP_I(Sprite, WaveMode)
 
 DEF_PROP_F(Sprite, ZoomX)
 DEF_PROP_F(Sprite, ZoomY)
@@ -135,5 +136,6 @@ void spriteBindingInit() {
     INIT_PROP_BIND(Sprite, WaveLength, "wave_length");
     INIT_PROP_BIND(Sprite, WaveSpeed, "wave_speed");
     INIT_PROP_BIND(Sprite, WavePhase, "wave_phase");
+    INIT_PROP_BIND(Sprite, WaveMode, "wave_mode");
   }
 }

@@ -135,7 +135,8 @@ static void mriBindingInit() {
     tilemapBindingInit();
   } else {
     windowVXBindingInit();
-    tilemapVXBindingInit();
+    tilemapBindingInit();
+    // tilemapVXBindingInit();
   }
 
   inputBindingInit();

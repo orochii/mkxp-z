@@ -73,6 +73,18 @@ static int getScancodeArg(VALUE *argv) {
   return code;
 }
 
+static int getJoyButtonArg(VALUE *argv) {
+  const char *scancode = rb_id2name(SYM2ID(*argv));
+  int code{};
+  try {
+    code = strToJoycode[scancode];
+  } catch (...) {
+    rb_raise(rb_eRuntimeError, "%s is not a valid name.", scancode);
+  }
+
+  return code;
+}
+
 RB_METHOD(inputPress) {
   RB_UNUSED_PARAM;
 
@@ -153,6 +165,52 @@ RB_METHOD(inputRepeatEx) {
 
   return rb_bool_new(shState->input().isRepeatedEx(NUM2INT(button), 1));
 }
+
+// ------------------------------------------------------------------------------------------
+// JOYSTICK RAW ACCESS
+// ------------------------------------------------------------------------------------------
+RB_METHOD(jinputPressEx) {
+  RB_UNUSED_PARAM;
+
+  VALUE button;
+  rb_scan_args(argc, argv, "1", &button);
+
+  if (SYMBOL_P(button)) {
+    int num = getJoyButtonArg(&button);
+    return rb_bool_new(shState->input().isJPressedEx(num, 0));
+  }
+
+  return rb_bool_new(shState->input().isJPressedEx(NUM2INT(button), 1));
+}
+
+RB_METHOD(jinputTriggerEx) {
+  RB_UNUSED_PARAM;
+
+  VALUE button;
+  rb_scan_args(argc, argv, "1", &button);
+
+  if (SYMBOL_P(button)) {
+    int num = getJoyButtonArg(&button);
+    return rb_bool_new(shState->input().isJTriggeredEx(num, 0));
+  }
+
+  return rb_bool_new(shState->input().isJTriggeredEx(NUM2INT(button), 1));
+}
+
+RB_METHOD(jinputRepeatEx) {
+  RB_UNUSED_PARAM;
+
+  VALUE button;
+  rb_scan_args(argc, argv, "1", &button);
+
+  if (SYMBOL_P(button)) {
+    int num = getJoyButtonArg(&button);
+    return rb_bool_new(shState->input().isJRepeatedEx(num, 0));
+  }
+
+  return rb_bool_new(shState->input().isJRepeatedEx(NUM2INT(button), 1));
+}
+// ------------------------------------------------------------------------------------------
 
 RB_METHOD(inputDir4) {
   RB_UNUSED_PARAM;
@@ -258,6 +316,18 @@ RB_METHOD(inputGets) {
   return ret;
 }
 
+RB_METHOD(inputLastKey) {
+  RB_UNUSED_PARAM;
+
+  return rb_fix_new(shState->input().getLastKey());
+}
+
+RB_METHOD(inputLastJoy) {
+  RB_UNUSED_PARAM;
+
+  return rb_fix_new(shState->input().getLastJoy());
+}
+
 RB_METHOD(inputGetClipboard) {
   RB_UNUSED_PARAM;
   VALUE ret;
@@ -342,10 +412,15 @@ void inputBindingInit() {
 
   _rb_define_module_function(module, "joystick", inputJoystickInfo);
   _rb_define_module_function(module, "rumble", inputRumble);
+  _rb_define_module_function(module, "jpressex?", jinputPressEx);
+  _rb_define_module_function(module, "jtriggerex?", jinputTriggerEx);
+  _rb_define_module_function(module, "jrepeatex?", jinputRepeatEx);
 
   _rb_define_module_function(module, "text_input", inputGetMode);
   _rb_define_module_function(module, "text_input=", inputSetMode);
   _rb_define_module_function(module, "gets", inputGets);
+  _rb_define_module_function(module, "lastKey", inputLastKey);
+  _rb_define_module_function(module, "lastJoy", inputLastJoy);
 
   _rb_define_module_function(module, "clipboard", inputGetClipboard);
   _rb_define_module_function(module, "clipboard=", inputSetClipboard);

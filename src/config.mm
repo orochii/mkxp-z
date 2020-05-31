@@ -44,7 +44,7 @@ Config::Config() {}
 
 void Config::read(int argc, char *argv[]) {
   OFMutableDictionary *opts = @{
-    @"rgssVersion" : @0,
+    @"rgssVersion" : @3,
     @"openGL4" : @false,
     @"debugMode" : @false,
     @"printFPS" : @false,
