@@ -328,6 +328,20 @@ RB_METHOD(inputLastJoy) {
   return rb_fix_new(shState->input().getLastJoy());
 }
 
+RB_METHOD(inputGetTriggerTreshold) {
+  RB_UNUSED_PARAM;
+
+  return rb_fix_new(shState->input().getTriggerThreshold());
+}
+
+RB_METHOD(inputSetTriggerTreshold) {
+  RB_UNUSED_PARAM;
+  int value;
+  rb_get_args(argc, argv, "i", &value RB_ARG_END);
+  shState->input().setTriggerThreshold(value);
+  return rb_fix_new(value);
+}
+
 RB_METHOD(inputGetClipboard) {
   RB_UNUSED_PARAM;
   VALUE ret;
@@ -421,6 +435,9 @@ void inputBindingInit() {
   _rb_define_module_function(module, "gets", inputGets);
   _rb_define_module_function(module, "lastKey", inputLastKey);
   _rb_define_module_function(module, "lastJoy", inputLastJoy);
+  
+  _rb_define_module_function(module, "triggerTreshold", inputGetTriggerTreshold);
+  _rb_define_module_function(module, "triggerTreshold=", inputSetTriggerTreshold);
 
   _rb_define_module_function(module, "clipboard", inputGetClipboard);
   _rb_define_module_function(module, "clipboard=", inputSetClipboard);

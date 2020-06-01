@@ -875,7 +875,8 @@ struct InputPrivate
     unsigned int rawJoyRepeatCount;
     uint8_t inputLastKey;
     uint8_t inputLastJoy;
-
+    int triggerThreshold = 16000;
+    
 	struct
 	{
 		int active;
@@ -1232,7 +1233,7 @@ struct InputPrivate
         // Update first 10 axis
         for (int i = 0; i < 10; i++) {
             int value = EventThread::joyState.axes[i];
-            rawJoyStates[i] = value != 0;
+            rawJoyStates[i] = value > triggerThreshold;
         }
         // Update first 10 hats
         for (int i = 0; i < 10; i++) {
@@ -1265,6 +1266,9 @@ struct InputPrivate
                 
                 break;
             }
+            
+        }
+        for (int i = 0; i < 40; i++) {
             // Update last trigger
             if (rawJoyStates[i] && !rawJoyStatesOld[i]) {
                 inputLastJoy = i;
@@ -1482,6 +1486,14 @@ int Input::getLastKey()
 int Input::getLastJoy()
 {
 	return p->inputLastJoy;
+}
+int Input::getTriggerThreshold()
+{
+    return p->triggerThreshold;
+}
+void Input::setTriggerThreshold(int val)
+{
+    p->triggerThreshold = val;
 }
 
 bool Input::getJoystickConnected()

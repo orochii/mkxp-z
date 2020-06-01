@@ -170,7 +170,9 @@ else
     endif
 endif
 
-exe_name = meson.project_name()
+# Executable name
+# Originally meson.project_name()
+exe_name = 'Game'
 if steamworks == true
     exe_name = meson.project_name() + '_rt'
     la = ''

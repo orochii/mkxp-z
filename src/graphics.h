@@ -63,8 +63,9 @@ public:
 	/* Non-standard extension */
 	DECL_ATTR( Fullscreen, bool )
 	DECL_ATTR( ShowCursor, bool )
-  DECL_ATTR( Scale,    double )
+  	DECL_ATTR( Scale,    double )
 	DECL_ATTR( Frameskip, bool )
+	bool getFocused() const;
 
 	/* <internal> */
 	Scene *getScreen() const;

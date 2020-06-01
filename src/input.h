@@ -74,6 +74,8 @@ public:
 	int mouseY();
 	int getLastKey();
 	int getLastJoy();
+	int getTriggerThreshold();
+	void setTriggerThreshold(int val);
     
     bool getJoystickConnected();
     const char *getJoystickName();

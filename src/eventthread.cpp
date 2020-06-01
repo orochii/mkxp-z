@@ -152,7 +152,7 @@ void EventThread::process(RGSSThreadData &rtData)
 	SDL_Rect gameScreen = { 0, 0, 0, 0 };
 
 	/* SDL doesn't send an initial FOCUS_GAINED event */
-	bool windowFocused = true;
+	windowFocused = true;
 
 	bool terminate = false;
 
@@ -764,6 +764,11 @@ void EventThread::showMessageBox(const char *body, int flags)
 bool EventThread::getFullscreen() const
 {
 	return fullscreen;
+}
+
+bool EventThread::getFocused() const
+{
+	return windowFocused;
 }
 
 bool EventThread::getShowCursor() const

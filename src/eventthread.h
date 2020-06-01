@@ -103,6 +103,7 @@ public:
 	void requestTerminate();
 
 	bool getFullscreen() const;
+	bool getFocused() const;
 	bool getShowCursor() const;
     bool getJoystickConnected() const;
     
@@ -128,6 +129,7 @@ private:
 	bool fullscreen;
     bool joystickConnected;
 	bool showCursor;
+	bool windowFocused;
     
     SDL_Joystick *js;
     SDL_Haptic *hapt;

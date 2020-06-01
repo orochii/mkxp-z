@@ -946,6 +946,10 @@ void Graphics::setFullscreen(bool value) {
   p->threadData->ethread->requestFullscreenMode(value);
 }
 
+bool Graphics::getFocused() const {
+  return p->threadData->ethread->getFocused();
+}
+
 bool Graphics::getShowCursor() const {
   return p->threadData->ethread->getShowCursor();
 }
