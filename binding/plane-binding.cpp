@@ -44,6 +44,13 @@ RB_METHOD(planeInitialize) {
   return self;
 }
 
+RB_METHOD(planeUpdate) {
+    RB_UNUSED_PARAM;
+    Plane *p = getPrivateData<Plane>(self);
+    p->update();
+    return rb_fix_new(0);
+  }
+
 DEF_PROP_OBJ_REF(Plane, Bitmap, Bitmap, "bitmap")
 DEF_PROP_OBJ_VAL(Plane, Color, Color, "color")
 DEF_PROP_OBJ_VAL(Plane, Tone, Tone, "tone")
@@ -55,6 +62,13 @@ DEF_PROP_I(Plane, BlendType)
 
 DEF_PROP_F(Plane, ZoomX)
 DEF_PROP_F(Plane, ZoomY)
+
+DEF_PROP_I(Plane, WaveAmp)
+DEF_PROP_I(Plane, WaveLen)
+DEF_PROP_I(Plane, WaveSpeed)
+DEF_PROP_F(Plane, WavePhase)
+DEF_PROP_I(Plane, WaveMode)
+DEF_PROP_I(Plane, WaveSize)
 
 void planeBindingInit() {
   VALUE klass = rb_define_class("Plane", rb_cObject);
@@ -68,6 +82,7 @@ void planeBindingInit() {
   viewportElementBindingInit<Plane>(klass);
 
   _rb_define_method(klass, "initialize", planeInitialize);
+  _rb_define_method(klass, "update", planeUpdate);
 
   INIT_PROP_BIND(Plane, Bitmap, "bitmap");
   INIT_PROP_BIND(Plane, OX, "ox");
@@ -78,4 +93,11 @@ void planeBindingInit() {
   INIT_PROP_BIND(Plane, BlendType, "blend_type");
   INIT_PROP_BIND(Plane, Color, "color");
   INIT_PROP_BIND(Plane, Tone, "tone");
+
+  INIT_PROP_BIND(Plane, WaveAmp,   "wave_amp");
+  INIT_PROP_BIND(Plane, WaveLen,   "wave_length");
+  INIT_PROP_BIND(Plane, WaveSpeed, "wave_speed");
+  INIT_PROP_BIND(Plane, WavePhase, "wave_phase");
+  INIT_PROP_BIND(Plane, WaveMode , "wave_mode");
+  INIT_PROP_BIND(Plane, WaveSize , "wave_size");
 }

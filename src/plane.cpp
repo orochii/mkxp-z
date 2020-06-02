@@ -34,6 +34,10 @@
 #include "shader.h"
 #include "glstate.h"
 
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
+
 #include <sigc++/connection.h>
 
 static float fwrap(float value, float range)
@@ -53,6 +57,16 @@ struct PlanePrivate
 
 	int ox, oy;
 	float zoomX, zoomY;
+
+	struct
+	{
+		int amp;
+		int length;
+		int speed;
+		float phase;
+		int mode;
+		int size;
+	} wave;
 
 	Scene::Geometry sceneGeo;
 
@@ -76,7 +90,12 @@ struct PlanePrivate
 	{
 		prepareCon = shState->prepareDraw.connect
 		        (sigc::mem_fun(this, &PlanePrivate::prepare));
-
+		wave.amp = 0;
+		wave.length = 180;
+		wave.speed = 360;
+		wave.phase = 0.0f;
+		wave.mode = 0;
+		wave.size = 8;
 		qArray.resize(1);
 	}
 
@@ -87,7 +106,7 @@ struct PlanePrivate
 
 	void updateQuadSource()
 	{
-		if (gl.npot_repeat)
+		if (gl.npot_repeat && wave.amp==0)
 		{
 			FloatRect srcRect;
 			srcRect.x = (sceneGeo.orig.x + ox) / zoomX;
@@ -121,18 +140,81 @@ struct PlanePrivate
 		size_t tilesY = ceil((vph - sh + woy) / sh) + 1;
 
 		FloatRect tex = bitmap->rect();
-
-		qArray.resize(tilesX * tilesY);
-
-		for (size_t y = 0; y < tilesY; ++y)
-			for (size_t x = 0; x < tilesX; ++x)
-			{
-				SVertex *vert = &qArray.vertices[(y*tilesX + x) * 4];
-				FloatRect pos(x*sw - wox, y*sh - woy, sw, sh);
-
-				Quad::setTexPosRect(vert, tex, pos);
+		if (wave.amp == 0) {
+			// If wave effect is not running, do as usual.
+			qArray.resize(tilesX * tilesY);
+			for (size_t y = 0; y < tilesY; ++y) {
+				for (size_t x = 0; x < tilesX; ++x)
+				{
+					SVertex *vert = &qArray.vertices[(y*tilesX + x) * 4];
+					FloatRect pos(x*sw - wox, y*sh - woy, sw, sh);
+					Quad::setTexPosRect(vert, tex, pos);
+				}
 			}
-
+		} else {
+			/* Vertical strips */
+			int stripsV = (int)ceilf(bitmap->height() / ( (float)wave.size ));
+			float chunkHeight = zoomY * wave.size;
+			float lastChunkH = (sh - (chunkHeight * stripsV));
+			float lastTexH = (bitmap->height() - (stripsV * wave.size));
+			if (lastChunkH == 0) lastChunkH = chunkHeight;
+			// If wave effect is not running, do as usual.
+			qArray.resize(tilesX * tilesY * stripsV);
+			for (size_t y = 0; y < tilesY; ++y) {
+				float yPos = y*sh - woy;
+				int yTile = y * tilesX * stripsV;
+				for (size_t x = 0; x < tilesX; ++x)
+				{
+					float xPos = x*sw - wox;
+					for (size_t v = 0; v < stripsV; ++v) {
+						float vPos = yPos + (v * chunkHeight);
+						float ccH = (v == stripsV-1) ? lastChunkH : chunkHeight;
+						float ctH = (v == stripsV-1) ? lastTexH : wave.size;
+						// Wave calculations
+						float wavePos = wave.phase + (vPos / (float) wave.length) * (float) (M_PI * 2);
+						float chunkX = sin(wavePos) * wave.amp;
+						// Do stuff
+						switch(wave.mode) {
+							case 1: // Vertical, normal
+							{
+								SVertex *vert = &qArray.vertices[(yTile + x * stripsV + v) * 4];
+								FloatRect pos(xPos, vPos, sw, ccH);
+								FloatRect tex2(tex.x, v * wave.size + chunkX, tex.w, ctH);
+								Quad::setTexPosRect(vert, tex2, pos);
+								break;
+							}
+							case 2: // Horizontal, interlaced
+							{
+								int n = (v + y * stripsV) & 1;
+								float chunkX_i = (n == 0) ? chunkX : -chunkX;
+								SVertex *vert = &qArray.vertices[(yTile + x * stripsV + v) * 4];
+								FloatRect pos(xPos, vPos, sw, ccH);
+								FloatRect tex2(tex.x + chunkX_i, v * wave.size, tex.w, ctH);
+								Quad::setTexPosRect(vert, tex2, pos);
+								break;
+							}
+							case 3: // Vertical, interlaced
+							{
+								int n = (v + y * stripsV) & 1;
+								float chunkX_i = (n == 0) ? chunkX : -chunkX;
+								SVertex *vert = &qArray.vertices[(yTile + x * stripsV + v) * 4];
+								FloatRect pos(xPos, vPos, sw, ccH);
+								FloatRect tex2(tex.x, v * wave.size + chunkX_i, tex.w, ctH);
+								Quad::setTexPosRect(vert, tex2, pos);
+								break;
+							}
+							default: // Horizontal, normal
+							{
+								SVertex *vert = &qArray.vertices[(yTile + x * stripsV + v) * 4];
+								FloatRect pos(xPos, vPos, sw, ccH);
+								FloatRect tex2(tex.x + chunkX, v * wave.size, tex.w, ctH);
+								Quad::setTexPosRect(vert, tex2, pos);
+							}
+						}
+					}
+				}
+			}
+		}
 		qArray.commit();
 	}
 
@@ -165,9 +247,65 @@ DEF_ATTR_SIMPLE(Plane, Opacity,   int,     p->opacity)
 DEF_ATTR_SIMPLE(Plane, Color,     Color&, *p->color)
 DEF_ATTR_SIMPLE(Plane, Tone,      Tone&,  *p->tone)
 
+DEF_ATTR_RD_SIMPLE(Plane, WaveAmp,   int,     p->wave.amp)
+DEF_ATTR_RD_SIMPLE(Plane, WaveLen,   int,     p->wave.length)
+DEF_ATTR_RD_SIMPLE(Plane, WaveSpeed, int,     p->wave.speed)
+DEF_ATTR_RD_SIMPLE(Plane, WavePhase, float,   p->wave.phase)
+DEF_ATTR_RD_SIMPLE(Plane, WaveMode , int  ,   p->wave.phase)
+DEF_ATTR_RD_SIMPLE(Plane, WaveSize , int  ,   p->wave.phase)
+
 Plane::~Plane()
 {
 	dispose();
+}
+
+void Plane::setWaveAmp(int value)
+{
+	guardDisposed();
+	if (p->wave.amp == value)
+	        return;
+	p->wave.amp = value;
+	p->quadSourceDirty = true;
+}
+void Plane::setWaveLen(int value)
+{
+	guardDisposed();
+	if (p->wave.length == value)
+	        return;
+	p->wave.length = value;
+	if (p->wave.amp != 0) p->quadSourceDirty = true;
+}
+void Plane::setWaveSpeed(int value)
+{
+	guardDisposed();
+	if (p->wave.speed == value)
+	        return;
+	p->wave.speed = value;
+	if (p->wave.amp != 0) p->quadSourceDirty = true;
+}
+void Plane::setWavePhase(float value)
+{
+	guardDisposed();
+	if (p->wave.phase == value)
+	        return;
+	p->wave.phase = value;
+	if (p->wave.amp != 0) p->quadSourceDirty = true;
+}
+void Plane::setWaveMode(int value)
+{
+	guardDisposed();
+	if (p->wave.mode == value)
+	        return;
+	p->wave.mode = value;
+	if (p->wave.amp != 0) p->quadSourceDirty = true;
+}
+void Plane::setWaveSize(int value)
+{
+	guardDisposed();
+	if (p->wave.size == value)
+	        return;
+	p->wave.size = value;
+	if (p->wave.amp != 0) p->quadSourceDirty = true;
 }
 
 void Plane::setBitmap(Bitmap *value)
@@ -249,6 +387,14 @@ void Plane::initDynAttribs()
 {
 	p->color = new Color;
 	p->tone = new Tone;
+}
+
+void Plane::update() {
+	// Update wave
+	if (p->wave.amp != 0) {
+		p->wave.phase += (p->wave.speed / 180.0f);
+		p->quadSourceDirty = true;
+	}
 }
 
 void Plane::draw()

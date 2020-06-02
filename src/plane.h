@@ -46,7 +46,13 @@ public:
 	DECL_ATTR( BlendType, int     )
 	DECL_ATTR( Color,     Color&  )
 	DECL_ATTR( Tone,      Tone&   )
-
+	DECL_ATTR( WaveAmp,   int     )
+	DECL_ATTR( WaveLen,   int     )
+	DECL_ATTR( WaveSpeed, int     )
+	DECL_ATTR( WavePhase, float   )
+	DECL_ATTR( WaveMode,  int     )
+	DECL_ATTR( WaveSize,  int     )
+	void update();
 	void initDynAttribs();
 
 private:
