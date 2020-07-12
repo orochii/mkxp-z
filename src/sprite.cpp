@@ -77,6 +77,7 @@ struct SpritePrivate
 		int speed;
 		float phase;
 		int mode;
+		int size;
 
 		/* Wave effect is active (amp != 0) */
 		bool active;
@@ -116,6 +117,7 @@ struct SpritePrivate
 		wave.phase = 0.0f;
 		wave.dirty = false;
 		wave.mode = 0;
+		wave.size = 8;
 	}
 
 	~SpritePrivate()
@@ -205,17 +207,33 @@ struct SpritePrivate
 	}
 
 	void emitWaveChunk(SVertex *&vert, float phase, int width,
-	                   float zoomY, int chunkY, int chunkLength)
+	                   float zoomY, int chunkY, int chunkLength, int index)
 	{
 		float wavePos = phase + (chunkY / (float) wave.length) * (float) (M_PI * 2);
 		float chunkX = sin(wavePos) * wave.amp;
 
 		FloatRect tex(0, chunkY / zoomY, width, chunkLength / zoomY);
 		FloatRect pos = tex;
-		if (wave.mode == 1) {
-			tex.y += chunkX;
-		} else {
-			pos.x = chunkX;
+		switch(wave.mode) {
+			case 1: // Vertical, normal
+				tex.y += chunkX;
+				break;
+			case 2: // Horizontal, interlaced
+				if (index % 2 == 0){
+					pos.x = chunkX;
+				} else {
+					pos.x = -chunkX;
+				}
+				break;
+			case 3: // Vertical, interlaced
+				if (index % 2 == 0){
+					tex.y += chunkX;
+				} else {
+					tex.y -= chunkX;
+				}
+				break;
+			default: // Horizontal, normal
+				pos.x = chunkX;
 		}
 		// quad.setTexRect(mirrored ? rect.hFlipped() : rect);
 		Quad::setTexPosRect(vert, mirrored ? tex.hFlipped() : tex, pos);
@@ -262,18 +280,17 @@ struct SpritePrivate
 
 			return;
 		}
-
 		/* The length of the sprite as it appears on screen */
 		int visibleLength = height * zoomY;
 
-		/* First chunk length (aligned to 8 pixel boundary */
-		int firstLength = ((int) trans.getPosition().y) % 8;
+		/* First chunk length (aligned to wave.size pixel boundary) */
+		int firstLength = ((int) trans.getPosition().y) % wave.size;
 
-		/* Amount of full 8 pixel chunks in the middle */
-		int chunks = (visibleLength - firstLength) / 8;
+		/* Amount of full wave.size pixel chunks in the middle */
+		int chunks = (visibleLength - firstLength) / wave.size;
 
 		/* Final chunk length */
-		int lastLength = (visibleLength - firstLength) % 8;
+		int lastLength = (visibleLength - firstLength) % wave.size;
 
 		wave.qArray.resize(!!firstLength + chunks + !!lastLength);
 		SVertex *vert = &wave.qArray.vertices[0];
@@ -281,13 +298,13 @@ struct SpritePrivate
 		float phase = (wave.phase * (float) M_PI) / 180.0f;
 
 		if (firstLength > 0)
-			emitWaveChunk(vert, phase, width, zoomY, 0, firstLength);
+			emitWaveChunk(vert, phase, width, zoomY, 0, firstLength, 0);
 
 		for (int i = 0; i < chunks; ++i)
-			emitWaveChunk(vert, phase, width, zoomY, firstLength + i * 8, 8);
+			emitWaveChunk(vert, phase, width, zoomY, firstLength + i * wave.size, wave.size, i+1);
 
 		if (lastLength > 0)
-			emitWaveChunk(vert, phase, width, zoomY, firstLength + chunks * 8, lastLength);
+			emitWaveChunk(vert, phase, width, zoomY, firstLength + chunks * wave.size, lastLength, chunks);
 
 		wave.qArray.commit();
 	}
@@ -334,6 +351,7 @@ DEF_ATTR_RD_SIMPLE(Sprite, WaveLength, int,     p->wave.length)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveSpeed,  int,     p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Sprite, WavePhase,  float,   p->wave.phase)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveMode,   int,     p->wave.mode)
+DEF_ATTR_RD_SIMPLE(Sprite, WaveSize,   int  ,   p->wave.size)
 
 DEF_ATTR_SIMPLE(Sprite, BushOpacity, int,     p->bushOpacity)
 DEF_ATTR_SIMPLE(Sprite, Opacity,     int,     p->opacity)
@@ -498,6 +516,7 @@ DEF_WAVE_SETTER(Length, length, int)
 DEF_WAVE_SETTER(Speed,  speed,  int)
 DEF_WAVE_SETTER(Phase,  phase,  float)
 DEF_WAVE_SETTER(Mode,  mode,  int)
+DEF_WAVE_SETTER(Size,  size,  int)
 
 #undef DEF_WAVE_SETTER
 

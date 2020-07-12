@@ -67,6 +67,7 @@ public:
 	DECL_ATTR( WaveLength,  int     )
 	DECL_ATTR( WaveSpeed,   int     )
 	DECL_ATTR( WavePhase,   float   )
+	DECL_ATTR( WaveSize,  	int     )
 	// asdasd
 	void initDynAttribs();
 

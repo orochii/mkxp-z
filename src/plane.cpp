@@ -251,8 +251,8 @@ DEF_ATTR_RD_SIMPLE(Plane, WaveAmp,   int,     p->wave.amp)
 DEF_ATTR_RD_SIMPLE(Plane, WaveLen,   int,     p->wave.length)
 DEF_ATTR_RD_SIMPLE(Plane, WaveSpeed, int,     p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Plane, WavePhase, float,   p->wave.phase)
-DEF_ATTR_RD_SIMPLE(Plane, WaveMode , int  ,   p->wave.phase)
-DEF_ATTR_RD_SIMPLE(Plane, WaveSize , int  ,   p->wave.phase)
+DEF_ATTR_RD_SIMPLE(Plane, WaveMode , int  ,   p->wave.mode)
+DEF_ATTR_RD_SIMPLE(Plane, WaveSize , int  ,   p->wave.size)
 
 Plane::~Plane()
 {
