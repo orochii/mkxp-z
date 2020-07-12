@@ -932,7 +932,8 @@ void Bitmap::saveToFile(const char *filename)
     getRaw(surf->pixels, surf->w * surf->h * 4);
     
     char *fn_normalized = shState->fileSystem().normalize(filename, 1, 1);
-    int rc = SDL_SaveBMP(surf, fn_normalized);
+    //int rc = SDL_SaveBMP(surf, fn_normalized);
+	int rc = IMG_SavePNG_RW(surf, SDL_RWFromFile(fn_normalized, "wb"), 1);
     
     SDL_FreeSurface(surf);
     delete fn_normalized;

@@ -892,13 +892,18 @@ void Graphics::screenshot(const char *filename) {
 #endif
 
   char *fn_normalized = shState->fileSystem().normalize(filename, 1, 1);
-  int rc = SDL_SaveBMP(img, fn_normalized);
-
+  //int rc = SDL_SaveBMP(img, fn_normalized);
+  int rc = IMG_SavePNG_RW(img, SDL_RWFromFile(fn_normalized, "wb"), 1);
   SDL_FreeSurface(img);
   delete fn_normalized;
   if (rc)
     throw new Exception(Exception::SDLError, "%s", SDL_GetError());
 }
+
+/*
+#define SDL_SaveBMP(surface, file) \
+        SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "wb"), 1)
+*/
 
 DEF_ATTR_RD_SIMPLE(Graphics, Brightness, int, p->brightness)
 
