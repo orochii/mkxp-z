@@ -52,6 +52,13 @@ public:
 	void bgsStop();
 	void bgsFade(int time);
 
+	void ambPlay(const char *filename,
+	             int volume = 100,
+	             int pitch = 100,
+	             float pos = 0);
+	void ambStop();
+	void ambFade(int time);
+
 	void mePlay(const char *filename,
 	            int volume = 100,
 	            int pitch = 100);
@@ -66,6 +73,7 @@ public:
 	void setupMidi();
 	float bgmPos();
 	float bgsPos();
+	float ambPos();
 
 	void reset();
 

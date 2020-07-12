@@ -37,6 +37,7 @@ struct AudioPrivate
 {
 	AudioStream bgm;
 	AudioStream bgs;
+	AudioStream amb;
 	AudioStream me;
 
 	SoundEmitter se;
@@ -66,6 +67,7 @@ struct AudioPrivate
 	AudioPrivate(RGSSThreadData &rtData)
 	    : bgm(ALStream::Looped, "bgm"),
 	      bgs(ALStream::Looped, "bgs"),
+		  amb(ALStream::Looped, "amb"),
 	      me(ALStream::NotLooped, "me"),
 	      se(rtData.config),
 	      syncPoint(rtData.syncPoint)
@@ -279,6 +281,23 @@ void Audio::bgsFade(int time)
 	p->bgs.fadeOut(time);
 }
 
+void Audio::ambPlay(const char *filename,
+                    int volume,
+                    int pitch,
+                    float pos)
+{
+	p->amb.play(filename, volume, pitch, pos);
+}
+
+void Audio::ambStop()
+{
+	p->amb.stop();
+}
+
+void Audio::ambFade(int time)
+{
+	p->amb.fadeOut(time);
+}
 
 void Audio::mePlay(const char *filename,
                    int volume,
@@ -325,10 +344,16 @@ float Audio::bgsPos()
 	return p->bgs.playingOffset();
 }
 
+float Audio::ambPos()
+{
+	return p->amb.playingOffset();
+}
+
 void Audio::reset()
 {
 	p->bgm.stop();
 	p->bgs.stop();
+	p->amb.stop();
 	p->me.stop();
 	p->se.stop();
 }

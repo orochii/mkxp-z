@@ -85,11 +85,13 @@ RB_METHOD(audio_##entity##Fade) \
 
 DEF_PLAY_STOP_POS( bgm )
 DEF_PLAY_STOP_POS( bgs )
+DEF_PLAY_STOP_POS( amb )
 
 DEF_PLAY_STOP( me )
 
 DEF_FADE( bgm )
 DEF_FADE( bgs )
+DEF_FADE( amb )
 DEF_FADE( me )
 
 DEF_PLAY_STOP( se )
@@ -135,10 +137,12 @@ audioBindingInit()
 
 	BIND_PLAY_STOP_FADE( bgm );
 	BIND_PLAY_STOP_FADE( bgs );
+	BIND_PLAY_STOP_FADE( amb );
 	BIND_PLAY_STOP_FADE( me  );
 
 	BIND_POS( bgm );
 	BIND_POS( bgs );
+	BIND_POS( amb );
 
 	_rb_define_module_function(module, "setup_midi", audioSetupMidi);
 
