@@ -143,7 +143,6 @@ static void _blitBegin(FBO::ID fbo, const Vec2i &size)
 	{
 		FBO::bind(fbo);
 		glState.viewport.pushSet(IntRect(0, 0, size.x, size.y));
-
 		SimpleShader &shader = shState->shaders().simple;
 		shader.bind();
 		shader.applyViewportProj();
@@ -161,7 +160,7 @@ void blitBeginScreen(const Vec2i &size)
 	_blitBegin(FBO::ID(0), size);
 }
 
-void blitSource(TEXFBO &source)
+void blitSource(TEXFBO &source, int pixellation)
 {
 	if (HAVE_NATIVE_BLIT)
 	{
@@ -171,6 +170,11 @@ void blitSource(TEXFBO &source)
 	{
 		SimpleShader &shader = shState->shaders().simple;
 		shader.setTexSize(Vec2i(source.width, source.height));
+		float ar = ((float)source.width)/source.height;
+		// Apply extra shader stuff?
+		shader.setPixellation(pixellation);
+		shader.setAspectRatio(Vec2(ar, 1));
+		// Bind texture (I think it's where it draws it?)
 		TEX::bind(source.tex);
 	}
 }

@@ -525,7 +525,7 @@ void Bitmap::stretchBlt(const IntRect &destRect,
 	{
 		/* Fast blit */
 		GLMeta::blitBegin(p->gl);
-		GLMeta::blitSource(source.p->gl);
+		GLMeta::blitSource(source.p->gl, 1);
 		GLMeta::blitRectangle(sourceRect, destRect);
 		GLMeta::blitEnd();
 	}
@@ -537,7 +537,7 @@ void Bitmap::stretchBlt(const IntRect &destRect,
 		TEXFBO &gpTex = shState->gpTexFBO(destRect.w, destRect.h);
 
 		GLMeta::blitBegin(gpTex);
-		GLMeta::blitSource(p->gl);
+		GLMeta::blitSource(p->gl, 1);
 		GLMeta::blitRectangle(destRect, Vec2i());
 		GLMeta::blitEnd();
 
@@ -1253,7 +1253,7 @@ void Bitmap::drawText(const IntRect &rect, const char *str, int align)
 			TEX::uploadSubImage(0, 0, txtSurf->w, txtSurf->h, txtSurf->pixels, GL_RGBA);
 
 			GLMeta::blitBegin(p->gl);
-			GLMeta::blitSource(gpTF);
+			GLMeta::blitSource(gpTF, 1);
 			GLMeta::blitRectangle(IntRect(0, 0, txtSurf->w, txtSurf->h),
 			                      posRect, true);
 			GLMeta::blitEnd();
@@ -1266,7 +1266,7 @@ void Bitmap::drawText(const IntRect &rect, const char *str, int align)
 		TEXFBO &gpTex2 = shState->gpTexFBO(posRect.w, posRect.h);
 
 		GLMeta::blitBegin(gpTex2);
-		GLMeta::blitSource(p->gl);
+		GLMeta::blitSource(p->gl, 1);
 		GLMeta::blitRectangle(posRect, Vec2i());
 		GLMeta::blitEnd();
 

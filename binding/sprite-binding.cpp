@@ -64,7 +64,7 @@ DEF_PROP_I(Sprite, Opacity)
 DEF_PROP_I(Sprite, BlendType)
 DEF_PROP_I(Sprite, WaveAmp)
 DEF_PROP_I(Sprite, WaveLength)
-DEF_PROP_I(Sprite, WaveSpeed)
+DEF_PROP_F(Sprite, WaveSpeed)
 DEF_PROP_I(Sprite, WaveMode)
 DEF_PROP_I(Sprite, WaveSize)
 

@@ -251,6 +251,8 @@ void ShaderBase::init()
 {
 	GET_U(texSizeInv);
 	GET_U(translation);
+	GET_U(pixellation);
+	GET_U(aspectRatio);
 
 	projMat.u_mat = gl.GetUniformLocation(program, "projMat");
 }
@@ -271,6 +273,15 @@ void ShaderBase::setTranslation(const Vec2i &value)
 	gl.Uniform2f(u_translation, value.x, value.y);
 }
 
+void ShaderBase::setPixellation(int value)
+{
+	gl.Uniform1f(u_pixellation, value);
+}
+
+void ShaderBase::setAspectRatio(const Vec2 &value)
+{
+	gl.Uniform2f(u_aspectRatio, value.x, value.y);
+}
 
 FlatColorShader::FlatColorShader()
 {

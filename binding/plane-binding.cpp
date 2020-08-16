@@ -65,7 +65,7 @@ DEF_PROP_F(Plane, ZoomY)
 
 DEF_PROP_I(Plane, WaveAmp)
 DEF_PROP_I(Plane, WaveLen)
-DEF_PROP_I(Plane, WaveSpeed)
+DEF_PROP_F(Plane, WaveSpeed)
 DEF_PROP_F(Plane, WavePhase)
 DEF_PROP_I(Plane, WaveMode)
 DEF_PROP_I(Plane, WaveSize)

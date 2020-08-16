@@ -292,7 +292,7 @@ void build(TEXFBO &tf, Bitmap *bitmaps[BM_COUNT])
 #define EXEC_BLITS(part) \
 	if (!nullOrDisposed(bm = bitmaps[BM_##part])) \
 	{ \
-		GLMeta::blitSource(bm->getGLTypes()); \
+		GLMeta::blitSource(bm->getGLTypes(), 1); \
 		for (size_t i = 0; i < blits##part##N; ++i) \
 		{\
 			const IntRect &src = blits##part[i].src; \

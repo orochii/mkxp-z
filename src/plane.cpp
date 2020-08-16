@@ -62,7 +62,7 @@ struct PlanePrivate
 	{
 		int amp;
 		int length;
-		int speed;
+		float speed;
 		float phase;
 		int mode;
 		int size;
@@ -249,7 +249,7 @@ DEF_ATTR_SIMPLE(Plane, Tone,      Tone&,  *p->tone)
 
 DEF_ATTR_RD_SIMPLE(Plane, WaveAmp,   int,     p->wave.amp)
 DEF_ATTR_RD_SIMPLE(Plane, WaveLen,   int,     p->wave.length)
-DEF_ATTR_RD_SIMPLE(Plane, WaveSpeed, int,     p->wave.speed)
+DEF_ATTR_RD_SIMPLE(Plane, WaveSpeed, float,   p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Plane, WavePhase, float,   p->wave.phase)
 DEF_ATTR_RD_SIMPLE(Plane, WaveMode , int  ,   p->wave.mode)
 DEF_ATTR_RD_SIMPLE(Plane, WaveSize , int  ,   p->wave.size)
@@ -275,7 +275,7 @@ void Plane::setWaveLen(int value)
 	p->wave.length = value;
 	if (p->wave.amp != 0) p->quadSourceDirty = true;
 }
-void Plane::setWaveSpeed(int value)
+void Plane::setWaveSpeed(float value)
 {
 	guardDisposed();
 	if (p->wave.speed == value)

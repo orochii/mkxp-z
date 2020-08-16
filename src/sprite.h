@@ -65,7 +65,7 @@ public:
 	DECL_ATTR( Tone,        Tone&   )
 	DECL_ATTR( WaveAmp,     int     )
 	DECL_ATTR( WaveLength,  int     )
-	DECL_ATTR( WaveSpeed,   int     )
+	DECL_ATTR( WaveSpeed,   float   )
 	DECL_ATTR( WavePhase,   float   )
 	DECL_ATTR( WaveSize,  	int     )
 	// asdasd

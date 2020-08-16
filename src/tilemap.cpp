@@ -512,7 +512,7 @@ struct TilemapPrivate
 			int blitW = std::min(autotile->width(), atAreaW);
 			int blitH = std::min(autotile->height(), atAreaH);
 
-			GLMeta::blitSource(autotile->getGLTypes());
+			GLMeta::blitSource(autotile->getGLTypes(), 1);
 
 			if (blitW <= autotileW && tiles.animated)
 			{
@@ -593,7 +593,7 @@ struct TilemapPrivate
 		{
 			/* Regular tileset */
 			GLMeta::blitBegin(atlas.gl);
-			GLMeta::blitSource(tileset->getGLTypes());
+			GLMeta::blitSource(tileset->getGLTypes(), 1);
 
 			for (size_t i = 0; i < blits.size(); ++i)
 			{

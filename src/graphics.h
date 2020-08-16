@@ -65,6 +65,7 @@ public:
 	DECL_ATTR( ShowCursor, bool )
   	DECL_ATTR( Scale,    double )
 	DECL_ATTR( Frameskip, bool )
+	DECL_ATTR( Pixellation, int )
 	bool getFocused() const;
 
 	/* <internal> */

@@ -74,7 +74,7 @@ struct SpritePrivate
 	{
 		int amp;
 		int length;
-		int speed;
+		float speed;
 		float phase;
 		int mode;
 		int size;
@@ -205,8 +205,11 @@ struct SpritePrivate
 
 		isVisible = SDL_HasIntersection(&self, &sceneRect);
 	}
-
-	void emitWaveChunk(SVertex *&vert, float phase, int width,
+	/*	
+	*	Horizontal wave chunk emission
+	*	Used by "traditional" wave effects.
+	*/	
+	void emitHorzWaveChunk(SVertex *&vert, float phase, int width,
 	                   float zoomY, int chunkY, int chunkLength, int index)
 	{
 		float wavePos = phase + (chunkY / (float) wave.length) * (float) (M_PI * 2);
@@ -215,31 +218,91 @@ struct SpritePrivate
 		FloatRect tex(0, chunkY / zoomY, width, chunkLength / zoomY);
 		FloatRect pos = tex;
 		switch(wave.mode) {
-			case 1: // Vertical, normal
+			case 1: // Vertical move, normal
 				tex.y += chunkX;
 				break;
-			case 2: // Horizontal, interlaced
+			case 2: // Horizontal move, interlaced
 				if (index % 2 == 0){
 					pos.x = chunkX;
 				} else {
 					pos.x = -chunkX;
 				}
 				break;
-			case 3: // Vertical, interlaced
+			case 3: // Vertical move, interlaced
 				if (index % 2 == 0){
 					tex.y += chunkX;
 				} else {
 					tex.y -= chunkX;
 				}
 				break;
-			default: // Horizontal, normal
+			default: // Horizontal move, normal
 				pos.x = chunkX;
 		}
 		// quad.setTexRect(mirrored ? rect.hFlipped() : rect);
 		Quad::setTexPosRect(vert, mirrored ? tex.hFlipped() : tex, pos);
 		vert += 4;
 	}
+	/*	
+	*	Vertical wave chunk emission
+	*	Variation of the traditional wave, made because I can.
+	*/	
+	void emitVertWaveChunk(SVertex *&vert, float phase, int height,
+	                   float zoomX, int chunkX, int chunkWidth, int index)
+	{
+		float wavePos = phase + (chunkX / (float) wave.length) * (float) (M_PI * 2);
+		float chunkY = sin(wavePos) * wave.amp;
 
+		FloatRect tex(chunkX / zoomX, 0, chunkWidth / zoomX, height);
+		FloatRect pos = tex;
+		switch(wave.mode) {
+			case 5: // Horizontal move, normal
+				tex.x += chunkY;
+				break;
+			case 6: // Vertical move, interlaced
+				if (index % 2 == 0){
+					pos.y = chunkY;
+				} else {
+					pos.y = -chunkY;
+				}
+				break;
+			case 7: // Horizontal move, interlaced
+				if (index % 2 == 0){
+					tex.x += chunkY;
+				} else {
+					tex.x -= chunkY;
+				}
+				break;
+			default: // Vertical move, normal
+				pos.y = chunkY;
+		}
+		// quad.setTexRect(mirrored ? rect.hFlipped() : rect);
+		Quad::setTexPosRect(vert, mirrored ? tex.hFlipped() : tex, pos);
+		vert += 4;
+	}
+	/*	
+	*	Effect chunk emission
+	*	Square-ish chunks for visual effects.
+	*/	
+	void emitEffectChunk(SVertex *&vert, float phase, int width, int height, 
+						float zoomX, float zoomY, int chunkX, int chunkY, int ix, int iy, int tX, int tY)
+	{
+		FloatRect tex(chunkX / zoomX, chunkY / zoomY, width / zoomX, height / zoomY);
+		FloatRect pos = tex;
+		switch(wave.mode) {
+			default: // Explode
+				float dst = (wave.amp * phase) + (wave.length * phase * phase)/2;
+				float idx = (tX * tY) - (ix + tX * iy);
+				float dsp = idx * phase;
+				float midX = ((float)ix - (tX/2)) / tX;
+				float midY = ((float)tY - iy - 1) / tY;
+				pos.x += dsp * midX * dst; //  * wave.amp / 180.0f
+				pos.y -= dsp * midY * dst; //  * wave.length / 180.0f
+		}
+		// quad.setTexRect(mirrored ? rect.hFlipped() : rect);
+		Quad::setTexPosRect(vert, mirrored ? tex.hFlipped() : tex, pos);
+		vert += 4;
+	}
+	// wave.mode >3: sprite effects (explode, etc)
 	void updateWave()
 	{
 		if (nullOrDisposed(bitmap))
@@ -250,13 +313,13 @@ struct SpritePrivate
 			wave.active = false;
 			return;
 		}
-
+		/* Enable wave */
 		wave.active = true;
-
+		/* Get general use properties */
 		int width = srcRect->width;
 		int height = srcRect->height;
+		float zoomX = trans.getScale().x;
 		float zoomY = trans.getScale().y;
-
 		if (wave.amp < -(width / 2))
 		{
 			wave.qArray.resize(0);
@@ -280,33 +343,137 @@ struct SpritePrivate
 
 			return;
 		}
-		/* The length of the sprite as it appears on screen */
-		int visibleLength = height * zoomY;
-
-		/* First chunk length (aligned to wave.size pixel boundary) */
-		int firstLength = ((int) trans.getPosition().y) % wave.size;
-
-		/* Amount of full wave.size pixel chunks in the middle */
-		int chunks = (visibleLength - firstLength) / wave.size;
-
-		/* Final chunk length */
-		int lastLength = (visibleLength - firstLength) % wave.size;
-
-		wave.qArray.resize(!!firstLength + chunks + !!lastLength);
-		SVertex *vert = &wave.qArray.vertices[0];
-
-		float phase = (wave.phase * (float) M_PI) / 180.0f;
-
-		if (firstLength > 0)
-			emitWaveChunk(vert, phase, width, zoomY, 0, firstLength, 0);
-
-		for (int i = 0; i < chunks; ++i)
-			emitWaveChunk(vert, phase, width, zoomY, firstLength + i * wave.size, wave.size, i+1);
-
-		if (lastLength > 0)
-			emitWaveChunk(vert, phase, width, zoomY, firstLength + chunks * wave.size, lastLength, chunks);
-
-		wave.qArray.commit();
+		/* CASE: HORIZONTAL WAVES */
+		if (wave.mode < 4) {
+			/* Vertical chunks */
+			int visibleLength = height * zoomY; 							/* The length of the sprite as it appears on screen */
+			int firstLength = ((int) trans.getPosition().y) % wave.size; 	/* First chunk length (aligned to wave.size pixel boundary) */
+			int vchunks = (visibleLength - firstLength) / wave.size; 		/* Amount of full wave.size pixel vchunks in the middle */
+			int lastLength = (visibleLength - firstLength) % wave.size; 	/* Final chunk length */
+			int vertChunks = !!firstLength + vchunks + !!lastLength;
+			/* Get total chunks. */
+			int totalChunks = vertChunks;
+			/* Resize array */
+			wave.qArray.resize(totalChunks);
+			/* Create reusable vert reference */
+			SVertex *vert = &wave.qArray.vertices[0];
+			/* Calculate phase value (radians) */
+			float phase = (wave.phase * (float) M_PI) / 180.0f;
+			/* Emit first chunk */
+			if (firstLength > 0)
+				emitHorzWaveChunk(vert, phase, width, zoomY, 0, firstLength, 0);
+			/* Emit middle chunks */
+			for (int i = 0; i < vchunks; ++i)
+				emitHorzWaveChunk(vert, phase, width, zoomY, firstLength + i * wave.size, wave.size, i+1);
+			/* Emit last chunk */
+			if (lastLength > 0)
+				emitHorzWaveChunk(vert, phase, width, zoomY, firstLength + vchunks * wave.size, lastLength, vchunks);
+			/* Commit changes to quad array */
+			wave.qArray.commit();
+		} 
+		/* CASE: VERTICAL WAVES */
+		else if (wave.mode < 8) {
+			/* Horizontal chunks */
+			int visibleWidth = width * zoomX;
+			int firstWidth = ((int) trans.getPosition().x) % wave.size;		/* The width of the sprite as it appears on screen */
+			int hchunks = (visibleWidth - firstWidth) / wave.size;			/* First chunk width (aligned to wave.size pixel boundary) */
+			int lastWidth = (visibleWidth - firstWidth) % wave.size;		/* Amount of full wave.size pixel hchunks in the middle */
+			int horzChunks = !!firstWidth + hchunks + !!lastWidth;			/* Final chunk width */
+			/* Get total chunks. */
+			int totalChunks = horzChunks;
+			/* Resize array */
+			wave.qArray.resize(totalChunks);
+			/* Create reusable vert reference */
+			SVertex *vert = &wave.qArray.vertices[0];
+			/* Calculate phase value (radians) */
+			float phase = (wave.phase * (float) M_PI) / 180.0f;
+			/* Emit first chunk */
+			if (firstWidth > 0)
+				emitVertWaveChunk(vert, phase, height, zoomX, 0, firstWidth, 0);
+			/* Emit middle chunks */
+			for (int i = 0; i < hchunks; ++i)
+				emitVertWaveChunk(vert, phase, height, zoomX, firstWidth + i * wave.size, wave.size, i+1);
+			/* Emit last chunk */
+			if (lastWidth > 0)
+				emitVertWaveChunk(vert, phase, height, zoomX, firstWidth + hchunks * wave.size, lastWidth, hchunks);
+			/* Commit changes to quad array */
+			wave.qArray.commit();
+		} 
+		/* CASE: SPRITE EFFECTS */
+		else {
+			/* Vertical chunks */
+			int visibleLength = height * zoomY; 							/* The length of the sprite as it appears on screen */
+			int firstLength = ((int) trans.getPosition().y) % wave.size; 	/* First chunk length (aligned to wave.size pixel boundary) */
+			int vchunks = (visibleLength - firstLength) / wave.size; 		/* Amount of full wave.size pixel vchunks in the middle */
+			int lastLength = (visibleLength - firstLength) % wave.size; 	/* Final chunk length */
+			int vertChunks = !!firstLength + vchunks + !!lastLength;
+			/* Horizontal chunks */
+			int visibleWidth = width * zoomX;
+			int firstWidth = ((int) trans.getPosition().x) % wave.size;		/* The width of the sprite as it appears on screen */
+			int hchunks = (visibleWidth - firstWidth) / wave.size;			/* First chunk width (aligned to wave.size pixel boundary) */
+			int lastWidth = (visibleWidth - firstWidth) % wave.size;		/* Amount of full wave.size pixel hchunks in the middle */
+			int horzChunks = !!firstWidth + hchunks + !!lastWidth;			/* Final chunk width */
+			/* Get total chunks. */
+			int totalChunks = horzChunks * vertChunks;
+			/* Resize array */
+			wave.qArray.resize(totalChunks);
+			/* Create reusable vert reference */
+			SVertex *vert = &wave.qArray.vertices[0];
+			/* Get fraction of phase */
+			float phase = wave.phase / 180.0f;
+			/* Emit first line of chunks */
+			if (firstLength > 0) {
+				/* Emit first chunk */
+				// emitEffectChunk(vert, phase, width, height, zoomX, zoomY, chunkX, chunkY, index)
+				// emitEffectChunk(vert, phase, height, zoomX, chunkX, chunkWidth, index)
+				if (firstWidth > 0)
+					emitEffectChunk(vert, phase, firstWidth, firstLength, zoomX, zoomY, 0, 0, 0, 0, horzChunks, vertChunks);
+				/* Emit middle chunks */
+				for (int i = 0; i < hchunks; ++i)
+					emitEffectChunk(vert, phase, wave.size, firstLength, zoomX, zoomY, firstWidth + i * wave.size, 0, i+1, 0, horzChunks, vertChunks);
+				/* Emit last chunk */
+				if (lastWidth > 0)
+					emitEffectChunk(vert, phase, lastWidth, firstLength, zoomX, zoomY, firstWidth + hchunks * wave.size, 0, hchunks, 0, horzChunks, vertChunks);
+			}
+			/* Emit middle lines of chunks */
+			for (int j = 0; j < vchunks; ++j) {
+				float currChunkY = firstLength + j * wave.size;
+				/* Emit first chunk */
+				// emitEffectChunk(vert, phase, width, height, zoomX, zoomY, chunkX, chunkY, index)
+				// emitEffectChunk(vert, phase, height, zoomX, chunkX, chunkWidth, index)
+				if (firstWidth > 0)
+					emitEffectChunk(vert, phase, firstWidth, wave.size, zoomX, zoomY, 
+									0, 									currChunkY, 0, 			j+1, horzChunks, vertChunks);
+				/* Emit middle chunks */
+				for (int i = 0; i < hchunks; ++i)
+					emitEffectChunk(vert, phase, wave.size, wave.size, zoomX, zoomY, 
+									firstWidth + i * wave.size, 		currChunkY, i+1, 		j+1, horzChunks, vertChunks);
+				/* Emit last chunk */
+				if (lastWidth > 0)
+					emitEffectChunk(vert, phase, lastWidth, wave.size, zoomX, zoomY, 
+									firstWidth + hchunks * wave.size, 	currChunkY, hchunks, 	j+1, horzChunks, vertChunks);
+			}
+			/* Emit last line of chunks */
+			float lastChunkY = firstLength + vchunks * wave.size;
+			if (lastLength > 0) {
+				/* Emit first chunk */
+				// emitEffectChunk(vert, phase, width, height, zoomX, zoomY, chunkX, chunkY, index)
+				// emitEffectChunk(vert, phase, height, zoomX, chunkX, chunkWidth, index)
+				if (firstWidth > 0)
+					emitEffectChunk(vert, phase, firstWidth, wave.size, zoomX, zoomY, 
+									0, 									lastChunkY, 0, 			vchunks, horzChunks, vertChunks);
+				/* Emit middle chunks */
+				for (int i = 0; i < hchunks; ++i)
+					emitEffectChunk(vert, phase, wave.size, wave.size, zoomX, zoomY, 
+									firstWidth + i * wave.size, 		lastChunkY, i+1, 		vchunks, horzChunks, vertChunks);
+				/* Emit last chunk */
+				if (lastWidth > 0)
+					emitEffectChunk(vert, phase, lastWidth, wave.size, zoomX, zoomY, 
+									firstWidth + hchunks * wave.size, 	lastChunkY, hchunks, 	vchunks, horzChunks, vertChunks);
+			}
+			/* Commit changes to quad array */
+			wave.qArray.commit();
+		}
 	}
 
 	void prepare()
@@ -348,7 +515,7 @@ DEF_ATTR_RD_SIMPLE(Sprite, Width,      int,     p->srcRect->width)
 DEF_ATTR_RD_SIMPLE(Sprite, Height,     int,     p->srcRect->height)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveAmp,    int,     p->wave.amp)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveLength, int,     p->wave.length)
-DEF_ATTR_RD_SIMPLE(Sprite, WaveSpeed,  int,     p->wave.speed)
+DEF_ATTR_RD_SIMPLE(Sprite, WaveSpeed,  float,   p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Sprite, WavePhase,  float,   p->wave.phase)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveMode,   int,     p->wave.mode)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveSize,   int  ,   p->wave.size)
@@ -513,7 +680,7 @@ void Sprite::setBlendType(int type)
 
 DEF_WAVE_SETTER(Amp,    amp,    int)
 DEF_WAVE_SETTER(Length, length, int)
-DEF_WAVE_SETTER(Speed,  speed,  int)
+DEF_WAVE_SETTER(Speed,  speed,  float)
 DEF_WAVE_SETTER(Phase,  phase,  float)
 DEF_WAVE_SETTER(Mode,  mode,  int)
 DEF_WAVE_SETTER(Size,  size,  int)

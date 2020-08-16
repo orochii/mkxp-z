@@ -171,7 +171,7 @@ public:
         glState.scissorTest.pushSet(false);
 
         GLMeta::blitBegin(pp.frontBuffer());
-        GLMeta::blitSource(pp.backBuffer());
+        GLMeta::blitSource(pp.backBuffer(), 1);
         GLMeta::blitRectangle(geometry.rect, Vec2i());
         GLMeta::blitEnd();
 
@@ -422,6 +422,7 @@ struct GraphicsPrivate {
   int frameRate;
   int frameCount;
   int brightness;
+  int pixellation;
 
   FPSLimiter fpsLimiter;
 
@@ -524,7 +525,7 @@ struct GraphicsPrivate {
     screen.composite();
 
     GLMeta::blitBegin(buffer);
-    GLMeta::blitSource(screen.getPP().frontBuffer());
+    GLMeta::blitSource(screen.getPP().frontBuffer(), 1);
     GLMeta::blitRectangle(IntRect(0, 0, scRes.x, scRes.y), Vec2i());
     GLMeta::blitEnd();
   }
@@ -540,7 +541,7 @@ struct GraphicsPrivate {
     screen.composite();
 
     GLMeta::blitBeginScreen(winSize);
-    GLMeta::blitSource(screen.getPP().frontBuffer());
+    GLMeta::blitSource(screen.getPP().frontBuffer(), 2);
 
     FBO::clear();
     metaBlitBufferFlippedScaled();
@@ -715,7 +716,7 @@ void Graphics::transition(int duration, const char *filename, int vague) {
     FBO::clear();
 
     GLMeta::blitBeginScreen(Vec2i(p->winSize));
-    GLMeta::blitSource(transBuffer);
+    GLMeta::blitSource(transBuffer, 1);
     p->metaBlitBufferFlippedScaled();
     GLMeta::blitEnd();
 
@@ -767,7 +768,7 @@ void Graphics::fadeout(int duration) {
 
     if (p->frozen) {
       GLMeta::blitBeginScreen(p->scSize);
-      GLMeta::blitSource(p->frozenScene);
+      GLMeta::blitSource(p->frozenScene, 1);
 
       FBO::clear();
       p->metaBlitBufferFlippedScaled();
@@ -792,7 +793,7 @@ void Graphics::fadein(int duration) {
 
     if (p->frozen) {
       GLMeta::blitBeginScreen(p->scSize);
-      GLMeta::blitSource(p->frozenScene);
+      GLMeta::blitSource(p->frozenScene, 1);
 
       FBO::clear();
       p->metaBlitBufferFlippedScaled();
@@ -985,6 +986,10 @@ void Graphics::setScale(double factor) {
   }
 }
 
+int Graphics::getPixellation() const { return p->pixellation; }
+
+void Graphics::setPixellation(int value) { p->pixellation = value; }
+
 bool Graphics::getFrameskip() const { return p->useFrameSkip; }
 
 void Graphics::setFrameskip(bool value) { p->useFrameSkip = value; }
@@ -998,7 +1003,7 @@ void Graphics::repaintWait(const AtomicFlag &exitCond, bool checkReset) {
   /* Repaint the screen with the last good frame we drew */
   TEXFBO &lastFrame = p->screen.getPP().frontBuffer();
   GLMeta::blitBeginScreen(p->winSize);
-  GLMeta::blitSource(lastFrame);
+  GLMeta::blitSource(lastFrame, 1);
 
   while (!exitCond) {
     shState->checkShutdown();
