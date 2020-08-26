@@ -288,15 +288,31 @@ struct SpritePrivate
 	{
 		FloatRect tex(chunkX / zoomX, chunkY / zoomY, width / zoomX, height / zoomY);
 		FloatRect pos = tex;
+		if (mirrored) pos.x = (tX - ix) * (width/zoomX);
 		switch(wave.mode) {
+			case 9:
+				{
+					float idx = (ix + (tX/4) * iy); // (tX * tY) - 
+					float dsp = (phase*wave.length - idx);
+					float xDsp = sin(phase + ix) * wave.amp;
+					if (dsp < 0) {
+						dsp = 0;
+						xDsp = 0;
+					}
+					pos.x += xDsp;
+					pos.y -= dsp;
+				}
+				break;
 			default: // Explode
-				float dst = (wave.amp * phase) + (wave.length * phase * phase)/2;
-				float idx = (tX * tY) - (ix + tX * iy);
-				float dsp = idx * phase;
-				float midX = ((float)ix - (tX/2)) / tX;
-				float midY = ((float)tY - iy - 1) / tY;
-				pos.x += dsp * midX * dst; //  * wave.amp / 180.0f
-				pos.y -= dsp * midY * dst; //  * wave.length / 180.0f
+				{
+					float dst = (wave.amp * phase) + (wave.length * phase * phase)/2;
+					float idx = (tX * tY) - (ix + tX * iy);
+					float dsp = idx * phase;
+					float midX = ((float)ix - (tX/2)) / tX;
+					float midY = ((float)tY - iy - 1) / tY;
+					pos.x += dsp * midX * dst * (mirrored ? -1 : 1); //  * wave.amp / 180.0f
+					pos.y -= dsp * midY * dst; //  * wave.length / 180.0f
+				}
 		}
 		// quad.setTexRect(mirrored ? rect.hFlipped() : rect);
 		Quad::setTexPosRect(vert, mirrored ? tex.hFlipped() : tex, pos);
